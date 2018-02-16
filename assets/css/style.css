@@ -79,3 +79,7 @@ footer {
 .navbar-brand {
     color: #707073;
 }
+
+.jumbotron {
+    border-radius: 0;
+}

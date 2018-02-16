@@ -15,13 +15,16 @@ let downloadBtns = document.getElementsByClassName("download-btn");
  * Functions
  */
 
-let download = (logoId, link) => {
+let download = (logoId, link) =>
+{
     let _canvas = document.getElementsByTagName("canvas")[0];
+    console.log(_canvas);
     link.href = _canvas.toDataURL();
-    link.download = logoId;
+    link.download = logoId + ".png";
 };
 
-let generateCanvas = (logoId, link) => {
+let generateCanvas = (logoId, link) =>
+{
     let _logo = document.createElement("img");
     _logo.src = "assets/img/" + logoId + ".png";
 
@@ -37,7 +40,8 @@ let generateCanvas = (logoId, link) => {
 
     document.body.appendChild(_canvas);
 
-    html2canvas(_canvas).then((canvas) => {
+    html2canvas(_canvas).then((canvas) =>
+    {
         _canvas.remove();
 
         canvas.id = "canvas";
@@ -50,8 +54,10 @@ let generateCanvas = (logoId, link) => {
 /**
  * Listen to the entry of taglines and edit in the logos.
  */
-tagline.addEventListener("keyup", (event) => {
-    Array.from(taglines).forEach(tag => {
+tagline.addEventListener("keyup", (event) =>
+{
+    Array.from(taglines).forEach(tag =>
+    {
         tag.innerText = tagline.value;
     });
 });
@@ -59,8 +65,10 @@ tagline.addEventListener("keyup", (event) => {
 /**
  * Listen to the download buttons and generate the logo for download.
  */
-Array.from(downloadBtns).forEach(btn => {
-    btn.addEventListener("click", (event) => {
+Array.from(downloadBtns).forEach(btn =>
+{
+    btn.addEventListener("click", () =>
+    {
         let logoId = btn.getAttribute("data-logo-id");
         generateCanvas(logoId, this);
     });
