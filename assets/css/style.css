@@ -1,0 +1,81 @@
+/* Importing the fonts */
+
+@font-face { 
+    font-family: 'FreigSanProLig';
+    src: url('/assets/fonts/FreigSanProLig.otf');
+}
+
+/* Core and resets */
+
+* {
+    font-family: 'FreigSanProLig';
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Main styles */
+
+header {
+    border-top: 5px solid #f9b625;
+    width: 100%;
+}
+
+footer {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.logo-header {
+    height: 2em;
+}
+
+.logo {
+    width: 3in;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.logo > img {
+    width: 100%;
+}
+
+.tagline {
+    font-size: 30pt;
+    width: 100%;
+    margin: 1ex auto 0 auto;
+    line-height: 1em;
+    text-transform: uppercase;
+    word-wrap: break-word;
+}
+
+.to-download {
+    width: 15in !important;
+    margin: 0;
+    padding: 0;
+}
+
+.to-download > .tagline {
+    font-size: 150pt;
+    padding-bottom: 0;
+}
+
+.colored, .grayscale {
+    color: #707073;
+}
+
+.black {
+    color: black;
+}
+
+.white, .black-bg {
+    color: white;
+}
+
+/* Bootstrap overrides */
+
+.navbar-brand {
+    color: #707073;
+}
