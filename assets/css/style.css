@@ -2,7 +2,7 @@
 
 @font-face { 
     font-family: 'FreigSanProLig';
-    src: url('assets/fonts/FreigSanProLig.otf');
+    src: url('../fonts/FreigSanProLig.otf');
 }
 
 /* Core and resets */
