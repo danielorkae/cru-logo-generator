@@ -61,15 +61,27 @@ function toTitleCase(s)
 /**
  * Download the logo
  */
-function download(logoId, link)
+function download(_logoId)
 {
     let _canvas = document.getElementsByTagName("canvas")[0];
+
+    let _btn = document.createElement("a");
+    _btn.href = _canvas.toDataURL("image/png");
+    _btn.download = getFileName(_logoId);
+    document.body.appendChild(_btn);
+
+    _btn.click();
+    _btn.remove();
+    _btn = null;
+
+    _canvas.remove();
+    _canvas = null;
 };
 
 /**
  * Generate the canvas to download
  */
-async function generateCanvas(logoId, link)
+async function generateCanvas(logoId, link, backgroundColor = null)
 {
     let _logo = document.createElement("img");
     _logo.src = "assets/img/" + logoId + ".png";
@@ -85,7 +97,7 @@ async function generateCanvas(logoId, link)
     _canvas.appendChild(_tagline);
 
     document.body.appendChild(_canvas);
-    document.body.appendChild(await html2canvas(_canvas));
+    document.body.appendChild(await html2canvas(_canvas, { "backgroundColor": backgroundColor }));
     _canvas.remove();
     _canvas = null;
 };
@@ -115,17 +127,7 @@ Array.from(downloadBtns).forEach(btn =>
         let _logoId = btn.getAttribute("data-logo-id");
 
         await generateCanvas(_logoId);
-        let _canvas = document.getElementsByTagName("canvas")[0];
-
-        let _btn = document.createElement("a");
-        _btn.href = _canvas.toDataURL("image/png");
-        _btn.download = getFileName(_logoId);
-        document.body.appendChild(_btn);
-        _btn.click();
-        _btn.remove();
-        _btn = null;
-        _canvas.remove();
-        _canvas = null;
+        download(_logoId);
     });
 });
 
