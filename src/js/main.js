@@ -23,6 +23,37 @@ function getTagline()
     return tagline.value;
 }
 
+function getFileName(logoId) 
+{
+    switch (logoId)
+    {
+        case "colored":
+            return `Logo Cru ${toTitleCase(getTagline())} - Colorido.png`;
+        case "grayscale":
+            return `Logo Cru ${toTitleCase(getTagline())} - Escala de cinza.png`;
+        case "black-bg":
+            return `Logo Cru ${toTitleCase(getTagline())} - Reverso.png`;
+        case "black":
+            return `Logo Cru ${toTitleCase(getTagline())} - Preto sólido.png`;
+        case "white":
+            return `Logo Cru ${toTitleCase(getTagline())} - Branco sólido.png`;
+        default:
+            return `Logo Cru ${toTitleCase(getTagline())}.png`;
+    }
+}
+
+/**
+ * Helpers
+ */
+
+/**
+ * Transform a string to Title Case
+ */
+function toTitleCase(s)
+{
+    return s.replace(/\w\S*/g, (t) => { return t.charAt(0).toUpperCase() + t.substr(1).toLowerCase(); });
+}
+
 /**
  * Functions
  */
@@ -86,7 +117,13 @@ Array.from(downloadBtns).forEach(btn =>
         await generateCanvas(_logoId);
         let _canvas = document.getElementsByTagName("canvas")[0];
 
-        window.open(_canvas.toDataURL("image/png"), "_blank");
+        let _btn = document.createElement("a");
+        _btn.href = _canvas.toDataURL("image/png");
+        _btn.download = getFileName(_logoId);
+        document.body.appendChild(_btn);
+        _btn.click();
+        _btn.remove();
+        _btn = null;
         _canvas.remove();
         _canvas = null;
     });
