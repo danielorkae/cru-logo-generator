@@ -42,6 +42,13 @@ footer {
     width: 100%;
 }
 
+.logo > * {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
 .tagline {
     font-size: 30pt;
     width: 100%;
