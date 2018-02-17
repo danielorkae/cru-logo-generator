@@ -12,44 +12,56 @@ let taglines = document.getElementsByClassName("tagline");
 let downloadBtns = document.getElementsByClassName("download-btn");
 
 /**
+ * Getters
+ */
+
+function getTagline()
+{
+    if (tagline.value == "")
+        return "campus";
+
+    return tagline.value;
+}
+
+/**
  * Functions
  */
 
-let download = (logoId, link) =>
+/**
+ * Download the logo
+ */
+function download(logoId, link)
 {
     let _canvas = document.getElementsByTagName("canvas")[0];
-    console.log(_canvas);
-    link.href = _canvas.toDataURL();
-    link.download = logoId + ".png";
 };
 
-let generateCanvas = (logoId, link) =>
+/**
+ * Generate the canvas to download
+ */
+async function generateCanvas(logoId, link)
 {
     let _logo = document.createElement("img");
     _logo.src = "assets/img/" + logoId + ".png";
 
     let _tagline = document.createElement("p");
     _tagline.classList.add("tagline");
-    _tagline.innerText = tagline.value;
+    _tagline.innerText = getTagline();
 
     let _canvas = document.createElement("div");
-    _canvas.id = "canvas";
+    _canvas.id = "canvas-" + logoId;
     _canvas.classList.add("logo", "to-download", logoId);
     _canvas.appendChild(_logo);
     _canvas.appendChild(_tagline);
 
     document.body.appendChild(_canvas);
-
-    html2canvas(_canvas).then((canvas) =>
-    {
-        _canvas.remove();
-
-        canvas.id = "canvas";
-        canvas.classList.add("collapse");
-        document.body.appendChild(canvas);
-        download(logoId, link);
-    });
+    document.body.appendChild(await html2canvas(_canvas));
+    _canvas.remove();
+    _canvas = null;
 };
+
+/**
+ * Listeners
+ */
 
 /**
  * Listen to the entry of taglines and edit in the logos.
@@ -58,7 +70,7 @@ tagline.addEventListener("keyup", (event) =>
 {
     Array.from(taglines).forEach(tag =>
     {
-        tag.innerText = tagline.value;
+        tag.innerText = getTagline();
     });
 });
 
@@ -67,10 +79,16 @@ tagline.addEventListener("keyup", (event) =>
  */
 Array.from(downloadBtns).forEach(btn =>
 {
-    btn.addEventListener("click", () =>
+    btn.addEventListener("click", async () =>
     {
-        let logoId = btn.getAttribute("data-logo-id");
-        generateCanvas(logoId, this);
+        let _logoId = btn.getAttribute("data-logo-id");
+
+        await generateCanvas(_logoId);
+        let _canvas = document.getElementsByTagName("canvas")[0];
+
+        window.open(_canvas.toDataURL("image/png"), "_blank");
+        _canvas.remove();
+        _canvas = null;
     });
 });
 
