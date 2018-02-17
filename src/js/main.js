@@ -81,7 +81,7 @@ function download(_logoId)
 /**
  * Generate the canvas to download
  */
-async function generateCanvas(logoId, link)
+async function generateCanvas(logoId, link, backgroundColor = null)
 {
     let _logo = document.createElement("img");
     _logo.src = "assets/img/" + logoId + ".png";
@@ -97,7 +97,7 @@ async function generateCanvas(logoId, link)
     _canvas.appendChild(_tagline);
 
     document.body.appendChild(_canvas);
-    document.body.appendChild(await html2canvas(_canvas));
+    document.body.appendChild(await html2canvas(_canvas, { "backgroundColor": backgroundColor }));
     _canvas.remove();
     _canvas = null;
 };
