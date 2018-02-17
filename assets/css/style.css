@@ -29,7 +29,7 @@ footer {
 }
 
 .logo-header {
-    height: 2em;
+    height: 1.5em;
 }
 
 .logo {
@@ -85,6 +85,11 @@ footer {
 
 .navbar-brand {
     color: #707073;
+}
+
+.navbar-brand > span {
+    position: relative;
+    top: 10px;
 }
 
 .jumbotron {

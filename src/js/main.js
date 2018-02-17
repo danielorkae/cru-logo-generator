@@ -97,7 +97,7 @@ async function generateCanvas(logoId, link)
 /**
  * Listen to the entry of taglines and edit in the logos.
  */
-tagline.addEventListener("keyup", (event) =>
+tagline.addEventListener("keyup", () =>
 {
     Array.from(taglines).forEach(tag =>
     {
