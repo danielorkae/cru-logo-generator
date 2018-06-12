@@ -63,7 +63,7 @@ function toTitleCase(s)
  */
 function download(_logoId)
 {
-    let _canvas = document.getElementsByTagName("canvas")[0];
+    let _canvas = document.getElementsByTagName("canvas")[ 0 ];
 
     let _btn = document.createElement("a");
     _btn.href = _canvas.toDataURL("image/png");
@@ -100,6 +100,7 @@ async function generateCanvas(logoId, link, backgroundColor = null)
     document.body.appendChild(await html2canvas(_canvas, { "backgroundColor": backgroundColor }));
     _canvas.remove();
     _canvas = null;
+    console.log("gerou 1")
 };
 
 /**
@@ -124,10 +125,18 @@ Array.from(downloadBtns).forEach(btn =>
 {
     btn.addEventListener("click", async () =>
     {
-        let _logoId = btn.getAttribute("data-logo-id");
+        var _logoId = btn.getAttribute("data-logo-id");
 
-        await generateCanvas(_logoId);
-        download(_logoId);
+
+        generateCanvas(_logoId)
+            .then(() =>
+            {
+                download(_logoId);
+            }).catch(() =>
+            {
+                alert("Eita, abençoado. Não deu certo pra gerar a imagem...");
+            })
+
     });
 });
 
