@@ -7,14 +7,21 @@
 /**
  * Variables
  */
-let tagline = document.getElementById("tagline");
-let taglines = document.getElementsByClassName("tagline");
-let downloadBtns = document.getElementsByClassName("download-btn");
+var tagline = document.getElementById("tagline");
+var taglines = document.getElementsByClassName("tagline");
+var downloadBtns = document.getElementsByClassName("download-btn");
+var interval = null;
+var counter = 0;
+var downloadBtn = null;
+var generatedLogoId = null;
 
 /**
  * Getters
  */
 
+/**
+ * Returns the tagline value
+ */
 function getTagline()
 {
     if (tagline.value == "")
@@ -23,7 +30,11 @@ function getTagline()
     return tagline.value;
 }
 
-function getFileName(logoId) 
+/**
+ * Returns the file name to download by logo id param 
+ * @param {*} logoId Logo id such as on html page
+ */
+function getFileNameByLogoId(logoId) 
 {
     switch (logoId)
     {
@@ -43,6 +54,61 @@ function getFileName(logoId)
 }
 
 /**
+ * Returns the document title
+ */
+function getPageTitle()
+{
+    return document.title;
+}
+
+/**
+ * Setters
+ */
+
+/**
+ * Set the page title by a tagline, respecting the pattern
+ */
+function setPageTitleByTagline(tagline)
+{
+    if(tagline != "" && tagline != "campus")
+        return document.title = `Cru ${ toTitleCase(tagline) } Logo Generator`;
+    
+    document.title = "Cru Logo Generator";
+}
+
+/**
+ * Change the history state and url by title and relative url parameters
+ * @param {*} title Title by the new state
+ * @param {*} url Relative url by the new state
+ */
+function setUrlByTagline(tagline)
+{
+    setPageTitleByTagline(getTagline());
+
+    let url = "?";
+
+    if(tagline != "" && tagline != "campus")
+        url = `?tagline=${ getTagline().toLowerCase() }`;
+
+    if (typeof (history.pushState) != "undefined") {
+        let state = { Title: getPageTitle(), Url: url };
+        history.pushState(state, state.Title, state.Url);
+    }
+}
+
+/**
+ * Set all logo taglines values
+ * @param {*} tagline The value of the new logo taglines
+ */
+function setTaglines(tagline)
+{
+    Array.from(taglines).forEach(tag =>
+    {
+        tag.innerText = tagline;
+    });
+}
+
+/**
  * Helpers
  */
 
@@ -59,30 +125,69 @@ function toTitleCase(s)
  */
 
 /**
- * Download the logo
+ * Execute on page is loaded
  */
-function download(_logoId)
+function onLoad()
 {
-    let _canvas = document.getElementsByTagName("canvas")[ 0 ];
+    let url = new URL(document.location.href);
 
-    let _btn = document.createElement("a");
-    _btn.href = _canvas.toDataURL("image/png");
-    _btn.download = getFileName(_logoId);
-    document.body.appendChild(_btn);
+    tagline.value = url.searchParams.get("tagline");
 
-    _btn.click();
-    _btn.remove();
-    _btn = null;
+    setPageTitleByTagline(tagline.value);
 
-    _canvas.remove();
-    _canvas = null;
-};
+    setTaglines(getTagline());
+}
+
+/**
+ * Count and change url on timeout
+ */
+function setUrlOnTimeout()
+{
+    if(counter > 0) 
+        return counter--;
+
+    clearInterval(interval);
+    interval = null;
+    resetCounter();
+
+    setUrlByTagline(getTagline())
+}
+
+/**
+ * Reset the counter to the default value
+ */
+function resetCounter() 
+{
+    counter = 5;
+}
+
+/**
+ * Reset the donwload button to default
+ */
+function resetDownloadBtn()
+{
+    if(downloadBtn != null)
+    {
+        downloadBtn.innerHTML = "Gerar";
+        downloadBtn.setAttribute("disabled", false);
+        downloadBtn.classList.remove("disabled");
+        downloadBtn = null;
+    }
+}
 
 /**
  * Generate the canvas to download
  */
 async function generateCanvas(logoId, link, backgroundColor = null)
 {
+    let _canvas = document.getElementsByTagName("canvas")[0];
+
+    if(_canvas != null)
+    {
+        _canvas.remove();
+        _canvas = null;
+    }
+
     let _logo = document.createElement("img");
     _logo.src = "assets/img/" + logoId + ".png";
 
@@ -90,7 +195,7 @@ async function generateCanvas(logoId, link, backgroundColor = null)
     _tagline.classList.add("tagline");
     _tagline.innerText = getTagline();
 
-    let _canvas = document.createElement("div");
+    _canvas = document.createElement("div");
     _canvas.id = "canvas-" + logoId;
     _canvas.classList.add("logo", "to-download", logoId);
     _canvas.appendChild(_logo);
@@ -100,8 +205,30 @@ async function generateCanvas(logoId, link, backgroundColor = null)
     document.body.appendChild(await html2canvas(_canvas, { "backgroundColor": backgroundColor }));
     _canvas.remove();
     _canvas = null;
-    console.log("gerou 1")
-};
+}
+
+/**
+ * Download the logo
+ */
+function download(_logoId)
+{
+    let _canvas = document.getElementsByTagName("canvas")[0];
+
+    let _btn = document.createElement("a");
+    _btn.href = _canvas.toDataURL("image/png");
+    _btn.download = getFileNameByLogoId(_logoId);
+    document.body.appendChild(_btn);
+
+    _btn.click();
+    _btn.remove();
+    _btn = null;
+
+    _canvas.remove();
+    _canvas = null;
+
+    generatedLogoId = null;
+    resetDownloadBtn();
+}
 
 /**
  * Listeners
@@ -112,10 +239,12 @@ async function generateCanvas(logoId, link, backgroundColor = null)
  */
 tagline.addEventListener("keyup", () =>
 {
-    Array.from(taglines).forEach(tag =>
-    {
-        tag.innerText = getTagline();
-    });
+    resetCounter();
+
+    setTaglines(getTagline());
+
+    if(interval == null)
+        interval = setInterval(setUrlOnTimeout, 100);
 });
 
 /**
@@ -125,16 +254,35 @@ Array.from(downloadBtns).forEach(btn =>
 {
     btn.addEventListener("click", async () =>
     {
-        var _logoId = btn.getAttribute("data-logo-id");
+        if(btn != downloadBtn)
+        {
+            resetDownloadBtn();
+            downloadBtn = btn;
+        }
 
+        var _logoId = downloadBtn.getAttribute("data-logo-id");
+
+        if(_logoId == generatedLogoId)
+            return download(_logoId);
+
+        downloadBtn.innerHTML = "Gerando..."
+        downloadBtn.setAttribute("disabled", true);
+        downloadBtn.classList.add("disabled");
 
         generateCanvas(_logoId)
             .then(() =>
             {
-                download(_logoId);
-            }).catch(() =>
+                generatedLogoId = _logoId;
+
+                downloadBtn.innerHTML = "Baixar";
+                downloadBtn.setAttribute("disabled", false);
+                downloadBtn.classList.remove("disabled");
+            }).catch(error =>
             {
-                alert("Eita, abençoado. Não deu certo pra gerar a imagem...");
+                generatedLogoId = null;
+
+                downloadBtn.innerHTML = "Erro!";
+                downloadBtn.classList.add("btn-danger");
             })
 
     });
