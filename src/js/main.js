@@ -61,6 +61,14 @@ function toTitleCase(s)
  */
 
 /**
+ * Execute on page is loaded
+ */
+function onLoad()
+{
+
+}
+
+/**
  * Download the logo
  */
 function download(_logoId)
@@ -80,7 +88,10 @@ function download(_logoId)
     _canvas = null;
 }
 
-function countDown()
+/**
+ * Count and change url on timeout
+ */
+function changeUrlOnTimeout()
 {
     if(counter > 0) 
         return counter--;
@@ -90,13 +101,18 @@ function countDown()
     resetCounter();
 
     if(tagline != "")
-        changeURL(
+        changeUrl(
             `Cru ${ toTitleCase(getTagline()) } Logo Generator`, 
             `?tagline=${ getTagline().toLowerCase() }`
         )
 }
 
-function changeURL(title, url)
+/**
+ * Change the history state and url by title and relative url parameters
+ * @param {*} title Title by the new state
+ * @param {*} url Relative url by the new state
+ */
+function changeUrl(title, url)
 {
     if (typeof (history.pushState) != "undefined") {
         let state = { Title: title, Url: url };
@@ -105,6 +121,9 @@ function changeURL(title, url)
     }
 }
 
+/**
+ * Reset the counter to the default value
+ */
 function resetCounter() 
 {
     counter = 5;
@@ -151,9 +170,7 @@ tagline.addEventListener("keyup", () =>
     });
 
     if(interval == null)
-    {
-        interval = setInterval(countDown, 100);
-    }
+        interval = setInterval(changeUrlOnTimeout, 100);
 });
 
 /**
