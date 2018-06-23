@@ -17,6 +17,9 @@ let counter = 0;
  * Getters
  */
 
+/**
+ * Returns the tagline value
+ */
 function getTagline()
 {
     if (tagline.value == "")
@@ -25,7 +28,11 @@ function getTagline()
     return tagline.value;
 }
 
-function getFileName(logoId) 
+/**
+ * Returns the file name to download by logo id param 
+ * @param {*} logoId Logo id such as on html page
+ */
+function getFileNameByLogoId(logoId) 
 {
     switch (logoId)
     {
@@ -42,6 +49,61 @@ function getFileName(logoId)
         default:
             return `Logo Cru ${toTitleCase(getTagline())}.png`;
     }
+}
+
+/**
+ * Returns the document title
+ */
+function getPageTitle()
+{
+    return document.title;
+}
+
+/**
+ * Setters
+ */
+
+/**
+ * Set the page title by a tagline, respecting the pattern
+ */
+function setPageTitleByTagline(tagline)
+{
+    if(tagline != "" && tagline != "campus")
+        return document.title = `Cru ${ toTitleCase(tagline) } Logo Generator`;
+    
+    document.title = "Cru Logo Generator";
+}
+
+/**
+ * Change the history state and url by title and relative url parameters
+ * @param {*} title Title by the new state
+ * @param {*} url Relative url by the new state
+ */
+function setUrlByTagline(tagline)
+{
+    setPageTitleByTagline(getTagline());
+
+    let url = "?";
+
+    if(tagline != "" && tagline != "campus")
+        url = `?tagline=${ getTagline().toLowerCase() }`;
+
+    if (typeof (history.pushState) != "undefined") {
+        let state = { Title: getPageTitle(), Url: url };
+        history.pushState(state, state.Title, state.Url);
+    }
+}
+
+/**
+ * Set all logo taglines values
+ * @param {*} tagline The value of the new logo taglines
+ */
+function setTaglines(tagline)
+{
+    Array.from(taglines).forEach(tag =>
+    {
+        tag.innerText = tagline;
+    });
 }
 
 /**
@@ -65,7 +127,13 @@ function toTitleCase(s)
  */
 function onLoad()
 {
+    let url = new URL(document.location.href);
 
+    tagline.value = url.searchParams.get("tagline");
+
+    setPageTitleByTagline(tagline.value);
+
+    setTaglines(getTagline());
 }
 
 /**
@@ -77,7 +145,7 @@ function download(_logoId)
 
     let _btn = document.createElement("a");
     _btn.href = _canvas.toDataURL("image/png");
-    _btn.download = getFileName(_logoId);
+    _btn.download = getFileNameByLogoId(_logoId);
     document.body.appendChild(_btn);
 
     _btn.click();
@@ -91,7 +159,7 @@ function download(_logoId)
 /**
  * Count and change url on timeout
  */
-function changeUrlOnTimeout()
+function setUrlOnTimeout()
 {
     if(counter > 0) 
         return counter--;
@@ -100,25 +168,7 @@ function changeUrlOnTimeout()
     interval = null;
     resetCounter();
 
-    if(tagline != "")
-        changeUrl(
-            `Cru ${ toTitleCase(getTagline()) } Logo Generator`, 
-            `?tagline=${ getTagline().toLowerCase() }`
-        )
-}
-
-/**
- * Change the history state and url by title and relative url parameters
- * @param {*} title Title by the new state
- * @param {*} url Relative url by the new state
- */
-function changeUrl(title, url)
-{
-    if (typeof (history.pushState) != "undefined") {
-        let state = { Title: title, Url: url };
-        history.pushState(state, state.Title, state.Url);
-        document.title = title;
-    }
+    setUrlByTagline(getTagline())
 }
 
 /**
@@ -164,13 +214,10 @@ tagline.addEventListener("keyup", () =>
 {
     resetCounter();
 
-    Array.from(taglines).forEach(tag =>
-    {
-        tag.innerText = getTagline();
-    });
+    setTaglines(getTagline());
 
     if(interval == null)
-        interval = setInterval(changeUrlOnTimeout, 100);
+        interval = setInterval(setUrlOnTimeout, 100);
 });
 
 /**
