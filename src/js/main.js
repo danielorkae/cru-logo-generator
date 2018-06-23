@@ -10,6 +10,8 @@
 let tagline = document.getElementById("tagline");
 let taglines = document.getElementsByClassName("tagline");
 let downloadBtns = document.getElementsByClassName("download-btn");
+let interval = null;
+let counter = 0;
 
 /**
  * Getters
@@ -76,7 +78,37 @@ function download(_logoId)
 
     _canvas.remove();
     _canvas = null;
-};
+}
+
+function countDown()
+{
+    if(counter > 0) 
+        return counter--;
+
+    clearInterval(interval);
+    interval = null;
+    resetCounter();
+
+    if(tagline != "")
+        changeURL(
+            `Cru ${ toTitleCase(getTagline()) } Logo Generator`, 
+            `?tagline=${ getTagline().toLowerCase() }`
+        )
+}
+
+function changeURL(title, url)
+{
+    if (typeof (history.pushState) != "undefined") {
+        let state = { Title: title, Url: url };
+        history.pushState(state, state.Title, state.Url);
+        document.title = title;
+    }
+}
+
+function resetCounter() 
+{
+    counter = 5;
+}
 
 /**
  * Generate the canvas to download
@@ -100,7 +132,6 @@ async function generateCanvas(logoId, link, backgroundColor = null)
     document.body.appendChild(await html2canvas(_canvas, { "backgroundColor": backgroundColor }));
     _canvas.remove();
     _canvas = null;
-    console.log("gerou 1")
 };
 
 /**
@@ -112,10 +143,17 @@ async function generateCanvas(logoId, link, backgroundColor = null)
  */
 tagline.addEventListener("keyup", () =>
 {
+    resetCounter();
+
     Array.from(taglines).forEach(tag =>
     {
         tag.innerText = getTagline();
     });
+
+    if(interval == null)
+    {
+        interval = setInterval(countDown, 100);
+    }
 });
 
 /**
