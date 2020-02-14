@@ -56,6 +56,11 @@ footer {
     line-height: 1em;
     text-transform: uppercase;
     word-wrap: break-word;
+    /*Limitando a 2 linhas*/
+    display: block;/* or inline-block */
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-height: 2em;
 }
 
 .to-download {
